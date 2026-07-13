@@ -8,34 +8,28 @@ pipeline {
             }
         }
 
-        stage('2. Setup Environment & Install Dependencies') {
+        stage('2. Install Dependencies') {
             steps {
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
-                    pip install pandas scikit-learn numpy pytest
-                '''
-                echo '✅ Dependencies installed into virtual environment!'
-            }
-        }
-
-        stage('3. Run Data & Code Tests') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    python3 -c "import pandas, sklearn, numpy; print('✅ Core ML libraries imported successfully!')"
+                    pip install -r requirements.txt
                 '''
             }
         }
 
-        stage('4. Train / Evaluate Model') {
+        stage('3. Deploy Gradio App') {
             steps {
                 sh '''
                     . venv/bin/activate
-                    if [ -f main.py ]; then python3 main.py; elif [ -f train.py ]; then python3 train.py; fi
+                    # Kill previous app instance if running
+                    pkill -f "python3 main.py" || true
+
+                    # Launch Gradio app in background
+                    nohup python3 main.py > gradio.log 2>&1 &
                 '''
-                echo '🚀 Model training/evaluation completed!'
+                echo '🚀 Gradio Student Performance App is running on port 7860!'
             }
         }
     }
