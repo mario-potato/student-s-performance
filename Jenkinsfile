@@ -13,9 +13,10 @@ pipeline {
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-                    if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+                    pip install --upgrade pip
+                    pip install pandas scikit-learn numpy pytest
                 '''
-                echo '✅ Virtual environment ready and dependencies installed!'
+                echo '✅ Dependencies installed into virtual environment!'
             }
         }
 
